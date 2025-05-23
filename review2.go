@@ -24,7 +24,7 @@ func main() {
 		fmt.Println("6. Hapus Data")
 		fmt.Println("7. Hapus Ulasan")
 		fmt.Println("8. Cari Lokasi")
-		fmt.Println("9. Urutan Data(bedasarkan rating)")
+		fmt.Println("9. Urutan Data (berdasarkan rating)")
 		fmt.Println("10. Tampilkan Fasilitas")
 		fmt.Println("11. Tampilkan Semua")
 		fmt.Println("0. Keluar")
@@ -62,9 +62,8 @@ func main() {
 		}
 	}
 }
-
 func tambahData() {
-	var nama, lokasi, ulasan string
+	var nama, lokasi string
 	var harga int
 	var rating float64
 	var namaFasilitas []string
@@ -92,11 +91,19 @@ func tambahData() {
 	fmt.Print("Rating: ")
 	fmt.Scan(&rating)
 
-	// Buang newline tersisa agar Scanln baca ulasan dengan benar
+	fmt.Print("Ulasan: ")
+	var ulasan string
 	fmt.Scanln()
-
-	fmt.Print("Ulasan:")
-	fmt.Scanln(&ulasan)
+	input := ""
+	for {
+		var line string
+		n, _ := fmt.Scanln(&line)
+		if n == 0 {
+			break
+		}
+		input += line + "  "
+	}
+	ulasan = input
 
 	coworkList = append(coworkList, CoWorkingSpace{
 		Nama:      nama,
@@ -187,25 +194,34 @@ func ubahRating() {
 	coworkList[n].Rating = rating
 	fmt.Println("Rating berhasil diubah")
 }
-
 func ubahUlasan() {
 	tampilkanSemua()
-	fmt.Print("Pilih nomer data yang ingin diubah: ")
+	fmt.Print("Pilih nomor data yang ingin diubah ulasannya: ")
 	var n int
 	fmt.Scan(&n)
+
 	if n < 1 || n > len(coworkList) {
-		fmt.Println("Data tidak ditemukan")
+		fmt.Println("Data tidak ditemukan.")
 		return
 	}
 	n--
 
-	fmt.Print("Masukkan ulasan baru: ")
-	fmt.Scanln() // Bersihkan newline buffer
-	var ulasan string
-	fmt.Scanln(&ulasan) // Baca kalimat ulasan dengan spasi
-
-	coworkList[n].Ulasan = ulasan
+	fmt.Print("Masukkan ulasan baru : ")
+	fmt.Scanln()
+	var ulasanBaru string
+	input := ""
+	for {
+		var line string
+		n, _ := fmt.Scanln(&line)
+		if n == 0 {
+			break
+		}
+		input += line + "  "
+	}
+	ulasanBaru = input
+	coworkList[n].Ulasan = ulasanBaru
 	fmt.Println("Ulasan berhasil diubah.")
+	tampilkanSemua()
 }
 
 func hapusData() {
@@ -218,10 +234,12 @@ func hapusData() {
 		return
 	}
 	n--
+
 	for i := n; i < len(coworkList)-1; i++ {
 		coworkList[i] = coworkList[i+1]
 	}
 	coworkList = coworkList[:len(coworkList)-1]
+
 	fmt.Println("Data berhasil dihapus")
 	tampilkanSemua()
 }
@@ -235,7 +253,7 @@ func hapusUlasan() {
 		fmt.Println("Data tidak ditemukan.")
 		return
 	}
-	coworkList[n-1].Ulasan = " "
+	coworkList[n-1].Ulasan = ""
 	fmt.Println("Ulasan berhasil dihapus.")
 }
 
@@ -286,6 +304,7 @@ func urutanData() {
 
 	fmt.Println("Data sudah diurutkan berdasarkan rating:")
 	tampilkanSemua()
+
 }
 
 func tampilkanSemua() {
@@ -300,7 +319,6 @@ func tampilkanSemua() {
 		fmt.Println("+----------------+--------------------------------------+")
 		fmt.Printf("| Rating         | %-36.1f |\n", c.Rating)
 		fmt.Println("+----------------+--------------------------------------+")
-
 		fmt.Print("| Fasilitas ")
 		if len(c.Fasilitas) > 0 {
 			fmt.Printf("%d. %-40s |\n", 1, c.Fasilitas[0])
@@ -311,25 +329,27 @@ func tampilkanSemua() {
 			fmt.Printf("%-40s |\n", "")
 		}
 		fmt.Println("+----------------+--------------------------------------+")
-
 		text := c.Ulasan
 		width := 36
-		for start := 0; start < len(text); start += width {
+		start := 0
+		line := 0
+		for start < len(text) {
 			end := start + width
 			if end > len(text) {
 				end = len(text)
 			}
-			line := text[start:end]
-			if start == 0 {
-				fmt.Printf("| Ulasan         | %-36s |\n", line)
+			sub := text[start:end]
+			if line == 0 {
+				fmt.Printf("| Ulasan         | %-36s |\n", sub)
 			} else {
-				fmt.Printf("| %-15s | %-36s |\n", "", line)
+				fmt.Printf("| %-15s | %-36s |\n", "", sub)
 			}
+			start = end
+			line++
 		}
 		fmt.Println("+----------------+--------------------------------------+")
 	}
 }
-
 func Fasilitas() {
 	for i := 0; i < len(coworkList); i++ {
 		c := coworkList[i]
