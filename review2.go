@@ -14,43 +14,6 @@ type CoWorkingSpace struct {
 var coworkList []CoWorkingSpace
 
 func main() {
-	// Data dummy
-	coworkList = append(coworkList, CoWorkingSpace{
-		Nama:      "Work Happy",
-		Lokasi:    "Purwokerto",
-		Fasilitas: []string{"WiFi", "Meeting Room", "Coffee", "Printer"},
-		Harga:     50000,
-		Rating:    4.5,
-		Ulasan:    "Tempat nyaman dan tenang.",
-	})
-
-	coworkList = append(coworkList, CoWorkingSpace{
-		Nama:      "Happy Life",
-		Lokasi:    "Bandung",
-		Fasilitas: []string{"WiFi", "Snack Bar", "AC", "Ruang Diskusi"},
-		Harga:     60000,
-		Rating:    4.7,
-		Ulasan:    "Sangat cocok untuk kerja tim.",
-	})
-
-	coworkList = append(coworkList, CoWorkingSpace{
-		Nama:      "Work band",
-		Lokasi:    "Bali",
-		Fasilitas: []string{"Coffe", "Snack Bar", "AC", "Ruang Diskusi"},
-		Harga:     65000,
-		Rating:    4.9,
-		Ulasan:    "Bagus dan sangat nyaman.",
-	})
-
-	coworkList = append(coworkList, CoWorkingSpace{
-		Nama:      "Work good",
-		Lokasi:    "Tegal",
-		Fasilitas: []string{"WiFi", "Snack Bar", "AC", "coffe"},
-		Harga:     40000,
-		Rating:    4.6,
-		Ulasan:    "Sangat cocok untuk kerja tim.",
-	})
-
 	for {
 		fmt.Println("MENU COWORKING SPACE")
 		fmt.Println("1. Tambah Data")
@@ -129,8 +92,11 @@ func tambahData() {
 	fmt.Print("Rating: ")
 	fmt.Scan(&rating)
 
-	fmt.Print("Ulasan: ")
-	fmt.Scan(&ulasan)
+	// Buang newline tersisa agar Scanln baca ulasan dengan benar
+	fmt.Scanln()
+
+	fmt.Print("Ulasan:")
+	fmt.Scanln(&ulasan)
 
 	coworkList = append(coworkList, CoWorkingSpace{
 		Nama:      nama,
@@ -190,7 +156,7 @@ func ubahFasilitas() {
 	var jumlah int
 
 	for i := 0; i < 10; i++ {
-		fmt.Printf("Fasilitas %d (kosongkan untuk berhenti): ", i+1)
+		fmt.Printf("Fasilitas %d (ketik 'STOP' untuk berhenti): ", i+1)
 		fmt.Scan(&fasilitas)
 		if fasilitas == "STOP" {
 			break
@@ -234,8 +200,9 @@ func ubahUlasan() {
 	n--
 
 	fmt.Print("Masukkan ulasan baru: ")
+	fmt.Scanln() // Bersihkan newline buffer
 	var ulasan string
-	fmt.Scan(&ulasan)
+	fmt.Scanln(&ulasan) // Baca kalimat ulasan dengan spasi
 
 	coworkList[n].Ulasan = ulasan
 	fmt.Println("Ulasan berhasil diubah.")
@@ -243,7 +210,7 @@ func ubahUlasan() {
 
 func hapusData() {
 	tampilkanSemua()
-	fmt.Print("Pilih nomer data yang ingin diubah: ")
+	fmt.Print("Pilih nomer data yang ingin dihapus: ")
 	var n int
 	fmt.Scan(&n)
 	if n < 1 || n > len(coworkList) {
@@ -271,8 +238,9 @@ func hapusUlasan() {
 	coworkList[n-1].Ulasan = " "
 	fmt.Println("Ulasan berhasil dihapus.")
 }
+
 func cariLokasi() {
-	fmt.Print("Cari lokasi: ")
+	fmt.Print("Cari Lokasi: ")
 	var lokasi string
 	fmt.Scan(&lokasi)
 
@@ -282,7 +250,7 @@ func cariLokasi() {
 		c := coworkList[i]
 		if c.Lokasi == lokasi {
 			if !ada {
-				fmt.Println("Pencarian lokasi:")
+				fmt.Println("Pencarian Lokasi:")
 				ada = true
 			}
 			fmt.Printf("Data %d\n", i+1)
@@ -299,9 +267,10 @@ func cariLokasi() {
 	}
 
 	if !ada {
-		fmt.Println("Nama tidak ditemukan")
+		fmt.Println("Lokasi tidak ditemukan")
 	}
 }
+
 func urutanData() {
 	for i := 0; i < len(coworkList)-1; i++ {
 		max := i
@@ -318,11 +287,10 @@ func urutanData() {
 	fmt.Println("Data sudah diurutkan berdasarkan rating:")
 	tampilkanSemua()
 }
-func tampilkanSemua() {
-	for i := 0; i < len(coworkList); i++ {
-		c := coworkList[i]
 
-		fmt.Printf("Data ke  %d\n", i+1)
+func tampilkanSemua() {
+	for i, c := range coworkList {
+		fmt.Printf("Data ke %d\n", i+1)
 		fmt.Println("+----------------+--------------------------------------+")
 		fmt.Printf("| Nama           | %-36s |\n", c.Nama)
 		fmt.Println("+----------------+--------------------------------------+")
@@ -336,15 +304,28 @@ func tampilkanSemua() {
 		fmt.Print("| Fasilitas ")
 		if len(c.Fasilitas) > 0 {
 			fmt.Printf("%d. %-40s |\n", 1, c.Fasilitas[0])
+			for j := 1; j < len(c.Fasilitas); j++ {
+				fmt.Printf("|           %d. %-40s |\n", j+1, c.Fasilitas[j])
+			}
 		} else {
 			fmt.Printf("%-40s |\n", "")
 		}
-		for j := 1; j < len(c.Fasilitas); j++ {
-			fmt.Printf("|           %d. %-40s |\n", j+1, c.Fasilitas[j])
-		}
 		fmt.Println("+----------------+--------------------------------------+")
 
-		fmt.Printf("| Ulasan         | %-36s |\n", c.Ulasan)
+		text := c.Ulasan
+		width := 36
+		for start := 0; start < len(text); start += width {
+			end := start + width
+			if end > len(text) {
+				end = len(text)
+			}
+			line := text[start:end]
+			if start == 0 {
+				fmt.Printf("| Ulasan         | %-36s |\n", line)
+			} else {
+				fmt.Printf("| %-15s | %-36s |\n", "", line)
+			}
+		}
 		fmt.Println("+----------------+--------------------------------------+")
 	}
 }
